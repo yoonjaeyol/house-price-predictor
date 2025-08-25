@@ -90,8 +90,8 @@ jobs:
         
     - name: Set up MLflow
       run: |
-        docker pull ghcr.io/mlflow/mlflow:latest
-        docker run -d -p 5000:5000 --name mlflow-server ghcr.io/mlflow/mlflow:latest mlflow server --host 0.0.0.0 --backend-store-uri sqlite:///mlflow.db
+        docker pull docker.io/mlflow/mlflow:latest
+        docker run -d -p 5000:5000 --name mlflow-server docker.io/mlflow/mlflow:latest mlflow server --host 0.0.0.0 --backend-store-uri sqlite:///mlflow.db
         
     - name: Wait for MLflow to start
       run: |
@@ -142,7 +142,7 @@ jobs:
       run: |
         COMMIT_HASH=$(echo ${{ github.sha }} | cut -c1-7)
         docker build -t docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH -f Dockerfile .
-        docker run -d -p 8000:8000 --name test-api ghcr.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH
+        docker run -d -p 8000:8000 --name test-api docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH
         for i in {1..10}; do
           curl -f http://localhost:8000/health && break || sleep 5;
         done
@@ -160,9 +160,9 @@ jobs:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
      
-    - name: Push Docker image to GHCR
+    - name: Push Docker image to docker
       run: |
         COMMIT_HASH=$(echo ${{ github.sha }} | cut -c1-7)
-        docker tag ghcr.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH ghcr.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:latest
-        docker push ghcr.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH
-        docker push ghcr.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:latest
+        docker tag docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:latest
+        docker push docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH
+        docker push docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:latest
